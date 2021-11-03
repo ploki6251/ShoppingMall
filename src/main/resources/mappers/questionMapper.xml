@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.myproject.mappers.questionMapper">
+	<!-- 등록 -->
+    <insert  id="questionInsert">
+        INSERT INTO question (member_code, question_title, question_content) 
+        VALUES (#{member_code}, #{question_title}, #{question_content})
+    </insert >
+    
+    <!-- 수정 -->
+    <update id="questionUpdate">
+        UPDATE question 
+        SET question_title = #{question_title}, question_content = #{question_content} 
+        WHERE question_num = #{question_num}
+    </update>    
+    
+    <!-- 삭제 -->
+    <delete id="questionDelete">
+    	delete from question where question_num = #{question_num}
+    </delete>	
+	
+	<!-- 리스트 -->
+	<select id="questionList" resultType="questionVO" parameterType="int">
+		select * 
+		from 
+			(select q.question_num, q.member_code, q.question_title, q.question_content, q.question_date, c.member_name, c.member_id 
+		    from question as q, member as c 
+		    where q.member_code = c.member_code) as qc 
+		left join comments as c 
+		on c.question_num = qc.question_num order by qc.question_date desc LIMIT #{startList}, #{listSize}	
+	</select>
+	
+	<!-- 페이징을 위한 글 갯수 -->
+	<select id="getBoardListCnt" resultType="int">
+		SELECT
+			count(*) as listCnt
+		FROM
+			board
+	</select>
+	
+	<!-- 상세보기 -->
+    <select id="questionView" resultType="questionVO">
+         select * 
+		from 
+			(select q.question_num, q.member_code, q.question_title, q.question_content, q.question_date, c.member_name, c.member_id 
+		    from question as q, member as c 
+		    where q.member_code = c.member_code) as qc 
+				left join comments as c 
+				on c.question_num = qc.question_num
+				where qc.question_num =#{question_num};
+    </select>
+    
+    
+</mapper>

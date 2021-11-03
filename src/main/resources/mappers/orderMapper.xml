@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.myproject.mappers.orderMapper">
+<!-- resultMap -->
+<resultMap type="com.myproject.domain.BasketVO" id="Basket">
+	<id property="bno" column="bno"></id>
+	<result property="member_code" column="member_code"></result>
+	<result property="product_code" column="product_code"></result>
+	<result property="basket_count" column="basket_count"></result>
+	<result property="basket_price" column="basket_price"></result>
+	<result property="register_date" column="register_date"></result>
+</resultMap>
+ 
+<resultMap type="com.myproject.domain.productVO" id="Products">
+	<id property="product_code" column="product_code"/>
+	<id property="img_view" column="img_view"/>
+	<id property="img_addr" column="img_addr"/>
+	<id property="product_type" column="product_type"/>
+	<id property="product_type_name" column="product_type_name"/>
+	<id property="product_name" column="product_name"/>
+	<id property="product_price" column="product_price"/>
+	<id property="product_read" column="product_read"/>
+	<id property="product_content" column="product_content"/>
+	<id property="product_count" column="product_count"/>
+	<id property="product_date" column="product_date"/>
+	<id property="product_like" column="product_like"/>
+</resultMap>
+
+<resultMap type="com.myproject.domain.TestBean" id="TestBeanMap">
+	<collection property="basket" resultMap="Basket"/>
+	<collection property="products" resultMap="Products"/>
+</resultMap>
+
+	<!-- 구매 -->
+    <insert  id="orderComplete">
+      CALL INSERT_INTO_BASKETORDERS(#{member_code},${total_price}, #{delivery_name}, #{roadFullAddr}, #{delivery_tel});
+    </insert >
+    
+    <!-- 주문완료(orders참조 테이블(bo_ref)에 입력 - 매개변수가 orderVO)  -->
+    <insert id="insertBo_refByOrderVO" parameterType="orderVO">
+    	CALL INSERT_INTO_BO_REF(#{product_code}, #{order_count});
+    </insert>
+    
+    <!-- 장바구니 주문 성공2 -->
+	<insert id="insertBo_ref" parameterType="BasketOrdersVO">
+		CALL INSERT_INTO_BO_REF(#{product_code}, #{order_count});
+	</insert>
+    
+    <!-- 취소 -->
+    <delete id="orderDelete">
+    	delete from orders where order_code = #{order_code}
+    </delete>
+    
+    <!-- 관리자 주문 목록(회원 주문 확인) -->
+	<select id="orderList" resultType="orderVO">
+		SELECT 
+			o.order_code, p.product_code, p.product_name, o.order_count, 
+			o.total_price, o.order_status, o.order_date, p.img_view,
+			m.member_id, m.member_name
+		FROM   orders o
+			inner join products p
+				on  o.product_code = p.product_code 
+			inner join member m
+				on  o.member_code = m.member_code
+		ORDER BY order_date DESC
+	</select>
+	
+	<!-- 관리자 주문 목록(비회원 주문 확인) -->
+	<select id="nonOrderList" resultType="orderVO">
+		SELECT 
+			o.order_code, p.product_code, p.product_name, 
+			o.order_count, o.total_price, o.order_status, 
+			o.order_date
+		FROM	orders o, products p 
+		WHERE 	o.product_code = p.product_code
+			and member_code is null
+		ORDER BY order_date DESC
+	</select>
+	
+	<!-- 회원 주문 조회(로그인 회원)-->
+	<select id="MemberOrdList" resultType="orderVO" parameterType="orderVO" >
+		SELECT  
+			o.order_code, o.member_code, o.product_code, 
+			o.order_count, o.total_price, o.order_status,	
+			o.order_date, p.product_name
+		FROM 
+			orders o, products p
+		WHERE 
+			o.product_code = p.product_code 
+		and	member_code = #{member_code}
+	</select> 
+	
+	<!-- 비회원 주문번호 확인 -->
+	<select id="nonlogin" resultType="orderVO">
+		SELECT 
+				*
+		FROM 
+				orders
+		WHERE	
+				order_code = #{order_code}		
+		and 	member_code is null	
+	</select>
+	
+	<!-- 비회원 주문 조회 -->
+	<select id="nonMemberOrdList" resultType="orderVO">
+		SELECT
+			o.order_code, p.product_code, p.product_name, o.order_count,
+			o.total_price, o.order_status, o.order_date, p.img_view,
+			p.product_price, o.delivery_name, o.roadFullAddr, o.delivery_tel
+		FROM
+			orders o, products p
+		WHERE
+			o.product_code = p.product_code
+		and order_code = #{order_code}
+	</select>
+	
+	<!-- 관리자 주문 상세보기 -->
+	<select id="orderView" resultType="orderVO">
+		SELECT
+			o.order_code, p.product_code, p.product_name, o.order_count,
+			o.total_price, o.order_status, o.order_date, p.img_view,
+			o.delivery_name, o.roadFullAddr, o.delivery_tel, 
+			p.product_price
+		FROM 
+			orders o, products p	
+		WHERE
+			o.product_code = p.product_code
+		and	order_code = #{order_code}
+	</select>
+	
+	<!-- 배송 상태 -->
+	<update id="delivery">
+		UPDATE
+			orders
+		SET	
+			order_status =  #{order_status}
+		WHERE
+			order_code	= #{order_code}
+	</update>
+	
+	<!-- 장바구니 주문 -->
+	<select id="basketOrder" parameterType="BasketVO" resultMap="TestBeanMap">
+		SELECT p.img_view, p.product_code, p.product_name, b.basket_count, b.basket_price 
+		FROM products p
+		JOIN basket b
+		ON p.product_code = b.product_code
+		WHERE b.bno = #{bno}
+		AND member_code = #{member_code};
+	</select>
+	
+	<!-- 장바구니 주문 성공2 -->
+	 <!-- insert id="insertBo_ref" parameterType="java.util.List">
+		<if test="list.size == '1'">
+		<foreach collection="list" item="item">
+			<![CDATA[CALL INSERT_INTO_BO_REF(#{item.product_code}, #{item.order_count}, #{item.total_price});]]>
+		</foreach>
+		</if>
+		<if test="list.size != '1'">
+		<foreach collection="list" item="item">
+			<![CDATA[CALL INSERT_INTO_BO_REF(#{item.product_code}, #{item.order_count}, #{item.total_price});]]>
+		</foreach>
+		</if>
+	</insert-->
+
+	
+	
+	
+    
+</mapper>
