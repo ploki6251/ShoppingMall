@@ -190,7 +190,7 @@
 	
 	<!--최근 한 달간 주문내역 보기 -->
 	<select id="orderListMonth" parameterType="orderVO" resultMap="TestBeanMap">
-		SELECT aaa.order_code, p.product_name, aaa.total_price, aaa.order_status, aaa.order_date, cnt_pc
+		SELECT aaa.order_code, p.product_name, p.img_view, aaa.total_price, aaa.order_status, aaa.order_date, cnt_pc
 		FROM (SELECT o.order_code, o.member_code, o.total_price, o.order_status, o.order_date, br.product_code, COUNT(product_code) cnt_pc
 	  	FROM orders o
 	  	JOIN bo_ref br
