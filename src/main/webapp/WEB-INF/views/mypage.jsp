@@ -192,6 +192,16 @@ padding:10px 10px 10px 10px;
 #no_exist{
 	color: #999999;
 }
+
+#pdt_img{
+	width: 20%;
+}
+
+#order_pic{
+	width: 150px;
+	height: 150px;
+	object-fit: fill;
+}
  
 	
 	
@@ -269,7 +279,7 @@ padding:10px 10px 10px 10px;
 						<caption>최근 한 달간 목록만 표시됩니다.</caption>
 						<thead class="thead-dark">
 							<tr>
-								<th>상품명</th>
+								<th colspan="2">상품명</th>
 								<th>총 가격</th>
 								<th>배송 상태</th>
 								<th>주문일자</th>
@@ -278,6 +288,9 @@ padding:10px 10px 10px 10px;
 						<tbody>
 							<c:forEach items="${orderListMon}" var="TestBean">
 								<tr onClick="location.href='${mypath}/mypage/orderview?order_code=${TestBean.orders.order_code}'">
+									<td id="pdt_img">
+										<img id="order_pic" src="${TestBean.products.img_view}" alt="이미지"/>
+									</td>
 									<td>
 										<c:set var="countOfProductCode" value="${TestBean.orders.cnt_pc}"></c:set>
 										<c:choose>
