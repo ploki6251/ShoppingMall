@@ -105,7 +105,7 @@ input:focus {outline:none;}
 		<h6>계좌번호</h6>
 		<p>국민은행 1111-1111-111111</p>
 		<p>예금주 logotest</p>		
-	</div>	
+	</div>
 	
 	<!-- 배송정보 -->
 	<div style="background-color: white;"  class="col-sm-7 p-3 m-1">			
