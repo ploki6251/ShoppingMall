@@ -86,7 +86,8 @@
 	<update id="updateMember" parameterType="MemberVO">
 		UPDATE member
 		SET member_name = #{member_name},
-			member_addr = #{member_addr},
+			member_addr1 = #{member_addr1},
+			member_addr2 = #{member_addr2},
 			member_email= #{member_email},
 			member_phone= #{member_phone}
 		WHERE member_code = #{member_code}
