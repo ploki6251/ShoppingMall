@@ -3,7 +3,14 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!-- 세션 사용여부 옵션 -->
 <!-- page 디렉티브의 session 속성의 기본값은 true이므로 false로 지정하지 않으면 자동 생성된다. -->
-<%@ page session="false" %>
+<% 
+if(session.getAttribute("member") == null) {
+
+	out.println("<script> alert('세션이 비어있습니다. 로그인 페이지로 이동합니다.'); </script>");
+	out.println("<script> location.href = '/member/login'; </script>");
+	//response.sendRedirect("/member/login"); 실행되기 이전의 out.print들은 무시함
+}
+%>
 
 <!DOCTYPE html>
 <html>

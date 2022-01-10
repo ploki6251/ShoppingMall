@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
@@ -25,6 +26,7 @@ import com.myproject.domain.productVO;
 import com.myproject.service.MemberService;
 import com.myproject.service.orderService;
 import com.myproject.service.productService;
+import com.myproject.utils.ScriptUtils;
 
 @Controller
 @RequestMapping(value="/order", produces="text/plain;charset=UTF-8")
@@ -75,16 +77,19 @@ public class orderController {
 	
 	
 	//basketorder 추가(이경태)
-		//장바구니 페이지에서 넘어가는 결제페이지
-		@RequestMapping(value="/basketorder", method=RequestMethod.GET)
-		public void basketOrder(@RequestParam("basketListbno[]") List<String> billBno, Model model, HttpServletRequest req, BasketVO basketVO) throws Exception {
+	//장바구니 페이지에서 넘어가는 결제페이지
+	@RequestMapping(value="/basketorder", method=RequestMethod.GET)
+	public void basketOrder(@RequestParam("basketListbno[]") List<String> billBno, Model model, HttpServletRequest req, BasketVO basketVO) throws Exception {
 			
-			//로그인세션가져오기		  
-			HttpSession session = req.getSession();
-			MemberVO memberVO = (MemberVO) session.getAttribute("member");
-			model.addAttribute("member", memberVO);
+		//로그인세션가져오기		  
+		HttpSession session = req.getSession();
+		MemberVO memberVO = (MemberVO) session.getAttribute("member");
+		model.addAttribute("member", memberVO);
+		
+		if(memberVO == null) {
+			System.out.println("세션이 비었음.");
+		}else {
 			
-			//결과를 저장할 result 값
 			//for문에 쓸 basketBno 변수
 			int basketBno = 0;
 			//결과 컬럼을 저장할 리스트
@@ -94,32 +99,37 @@ public class orderController {
 			
 			//System.out.println("billBno : " + billBno);
 			
-			if(memberVO != null) {
-				basketVO.setMember_code(member_code);
+			basketVO.setMember_code(member_code);
+			
+			for(String i : billBno) { //String 형 List인 `billBno`의 요소를 차례로 방문
+				basketBno = Integer.parseInt(i);
+				basketVO.setBno(basketBno);
 				
-				for(String i : billBno) { //String 형 List인 `billBno`의 요소를 차례로 방문
-					basketBno = Integer.parseInt(i);
-					basketVO.setBno(basketBno);
-					
-					baksetBnoList.add(orderService.basketOrder(basketVO));
-				}
+				baksetBnoList.add(orderService.basketOrder(basketVO));
 			}
+			
 			model.addAttribute("basketbnoList", baksetBnoList);
 		}
+	}
+	
+	//basketorderComplete 추가 (이경태)
+	//장바구니 결제창 결제 성공 controller
+	@RequestMapping(value="/boComplete", method=RequestMethod.GET)
+	public void boComplete(@RequestParam("product_code[]") List<Integer> pc,
+						   @RequestParam("order_count[]") List<Integer> oc, 
+						   @RequestParam("total_price[]") List<Integer> tp,
+						   HttpServletRequest req,
+						   orderVO orderVO, Model model) 					throws Exception{
 		
-		//basketorderComplete 추가 (이경태)
-		//장바구니 결제창 결제 성공 controller
-		@RequestMapping(value="/boComplete", method=RequestMethod.GET)
-		public void boComplete(@RequestParam("product_code[]") List<Integer> pc,
-							   @RequestParam("order_count[]") List<Integer> oc, 
-							   @RequestParam("total_price[]") List<Integer> tp,
-							   HttpServletRequest req, orderVO orderVO, Model model) 			throws Exception{
-			
-			//로그인세션가져오기		  
-			HttpSession session = req.getSession();			
-			MemberVO memberVO = (MemberVO) session.getAttribute("member");
-			model.addAttribute("member", memberVO);
-			
+		//로그인세션가져오기		  
+		HttpSession session = req.getSession();			
+		MemberVO memberVO = (MemberVO) session.getAttribute("member");
+		model.addAttribute("member", memberVO);
+		
+		//세션이 비어있으면 alert 후 로그인 화면으로 돌려보냄
+		if(memberVO == null) {
+			System.out.println("세션이 비었음.");
+		}else {
 			//배열 첨자로 사용될 변수
 			int cnt1 = 0;
 			int cnt2 = 0;
@@ -196,10 +206,10 @@ public class orderController {
 				//System.out.println("테스트 값 : " + baorVO);
 				orderService.insertBo_ref(baorVO);
 			}
-			*/
+			*/	
 		}
-	
-	
+	}
+		
 	//주소찾기
 	@RequestMapping(value = "/jusoPopup", method = {RequestMethod.GET, RequestMethod.POST})
 	public void jusoPopup() throws Exception {

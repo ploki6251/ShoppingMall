@@ -85,11 +85,11 @@
 	<!-- 회원 정보 수정(비밀번호 외의 것) -->
 	<update id="updateMember" parameterType="MemberVO">
 		UPDATE member
-		SET member_name = #{member_name},
+		SET member_name  = #{member_name},
 			member_addr1 = #{member_addr1},
 			member_addr2 = #{member_addr2},
-			member_email= #{member_email},
-			member_phone= #{member_phone}
+			member_email = #{member_email},
+			mobile 	 = #{member_tel}
 		WHERE member_code = #{member_code}
 	</update>
 	

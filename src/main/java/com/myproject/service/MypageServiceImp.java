@@ -55,8 +55,8 @@ public class MypageServiceImp implements MypageService {
 	
 	//찜목록 삭제(bno)
 	@Override
-	public void deleteLikey(LikeyVO likeyvo) throws Exception{
-		mypageDAO.deleteLikey(likeyvo);
+	public int deleteLikey(LikeyVO likeyvo) throws Exception{
+		return mypageDAO.deleteLikey(likeyvo);
 	}
 	
 	//찜목록 삭제(product_code로)
@@ -88,8 +88,8 @@ public class MypageServiceImp implements MypageService {
 	
 	//장바구니 목록 삭제
 	@Override
-	public void deleteBasket(BasketVO basketVO) throws Exception {
-		mypageDAO.deleteBasket(basketVO);
+	public int deleteBasket(BasketVO basketVO) throws Exception {
+		return mypageDAO.deleteBasket(basketVO);
 	}
 	
 	//주문내역 보기

@@ -4,7 +4,14 @@
 <%@ taglib prefix="fn"  uri="http://java.sun.com/jsp/jstl/functions" %> 
 <!-- 세션 사용여부 옵션 -->
 <!-- page 디렉티브의 session 속성의 기본값은 true이므로 false로 지정하지 않으면 자동 생성된다. -->
-<%@ page session="false" %>
+<% 
+if(session.getAttribute("member") == null) {
+
+	out.println("<script> alert('세션이 비어있습니다. 로그인 페이지로 이동합니다.'); </script>");
+	out.println("<script> location.href = '/member/login'; </script>");
+	//response.sendRedirect("/member/login"); 실행되기 이전의 out.print들은 무시함
+}
+%>
 
 <!DOCTYPE html>
 <html>
@@ -73,7 +80,7 @@
 								<td><input type="checkbox" class="select_item" name="select_item" data-bno="${LikeyVO.likey.bno}"  /></td>
 								<td style="width: 10%"><img src="${LikeyVO.products.img_view}" alt="상품썸네일"/></td>
 								<td><a href="${path}/products/productView?product_code=${LikeyVO.products.product_code}">${LikeyVO.products.product_name }</a></td>
-								<td> ${LikeyVO.products.product_price}</td>
+								<td> <fmt:formatNumber pattern="###,###,###" value="${LikeyVO.products.product_price}"/>원</td>
 								<td><fmt:formatDate value="${LikeyVO.likey.register_date}" pattern="yyyy-MM-dd"/></td>
 							</tr>
 						</c:forEach>

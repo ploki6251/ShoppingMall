@@ -5,10 +5,20 @@
 <%@ include file="../../../resources/css/bootstrap.jsp" %>
 <!-- 세션 사용여부 옵션 -->
 <!-- page 디렉티브의 session 속성의 기본값은 true이므로 false로 지정하지 않으면 자동 생성된다. -->
-<%@ page session="false" %>
+
+<% 
+if(session.getAttribute("member") == null) {
+
+	out.println("<script> alert('세션이 비어있습니다. 로그인 페이지로 이동합니다.'); </script>");
+	out.println("<script> location.href = '/member/login'; </script>");
+	//response.sendRedirect("/member/login"); 실행되기 이전의 out.print들은 무시함
+}
+%>
 
 <!DOCTYPE html>
 <html>
+
+
 <head>
 	<meta charset="UTF-8">
 	<title>주문내역</title>
@@ -18,6 +28,12 @@
 	body{
 		background-color: #F8F8F8;
 		padding-top: 180px;
+	}
+	
+	
+	
+	#datepicker_bar{
+		width: 775px;
 	}
 	
 	td, th{
@@ -63,19 +79,25 @@
 		
 		<form class="form-horizontal" id="form_search" action="${path}/mypage/order" method="post">
 		
-			<div class="form-group" align="center">
-				<!-- datepicker -->
-				<input type="text" id="from_date" value="${from_date}"> ~
-		  		<input type="text" id="to_date" value="${to_date}">
-				<!-- datepicker -->
+			<div class="form-group" align="right">
+				<div id="datepicker_bar" align="left">
+					<!-- datepicker -->
+					<input type="text" id="from_date" value="${from_date}"> ~
+			  		<input type="text" id="to_date" value="${to_date}">
+			  		&nbsp;&nbsp;&nbsp;
+			  		<button type="button" class="btn btn-dark" onclick="view_orderList()">search</button>
+					<!-- datepicker -->
+				</div>
 			</div>
+			
 			
 			<input type="hidden" id="start_date" name="from_date" value="">
 			<input type="hidden" id="end_date" name="to_date" value="">
 			
-			<div class="form-group" align="center">
-				<button type="button" class="btn btn-dark btn-sm" onclick="view_orderList()">보기</button>
-			</div>
+			
+			
+			
+			
 			
 			<div class="form-group" align="center">
 				<button type="button" class="btn btn-dark btn-sm" onclick="setDate('day')">오늘</button>
@@ -83,6 +105,10 @@
 				<button type="button" class="btn btn-dark btn-sm" onclick="setDate('month')">한 달</button>
 				<button type="button" class="btn btn-dark btn-sm" onclick="setDate('threeMonth')">3개월</button>
 				<button type="button" class="btn btn-dark btn-sm" onclick="setDate('sixMonth')">6개월</button>
+			</div>
+			
+			<div class="form-group" align="center">
+			<button type="button" class="btn btn-dark btn-sm" >전체</button>
 			</div>
 		</form>
 		
@@ -120,7 +146,7 @@
 											<c:when test="${countOfProductCode > 1}">${TestBean.products.product_name} 외 ${countOfProductCode - 1} 건</c:when>
 											<c:otherwise>오류발생 ?</c:otherwise>
 										</c:choose></td>
-								<td>${TestBean.orders.total_price}</td>
+								<td><fmt:formatNumber pattern="###,###,###" value="${TestBean.orders.total_price}"/>원</td>
 								<td><a href="${path}/mypage/orderview?order_code=${TestBean.orders.order_code}"><button class="btn btn-dark btn-sm">상세보기</button></a></td>
 								<td>${TestBean.orders.order_status}</td>
 							</tr>
@@ -212,7 +238,7 @@ $(document).ready(function(){
 });
 
 //날짜처리
-var date = new Date();
+var date = new Date(); //오늘날짜
 var week = new Date();
 var month = new Date();
 var threeMonth = new Date();

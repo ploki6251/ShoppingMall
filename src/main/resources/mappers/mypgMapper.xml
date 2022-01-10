@@ -124,6 +124,7 @@
 		ON p.product_code = l.product_code
 		WHERE l.register_date BETWEEN date_add(SYSDATE(), interval -1 month) AND SYSDATE()
 		AND l.member_code = #{member_code}
+		ORDER BY l.register_date ASC;
 	</select>
 	
 	<!-- 찜목록 삭제(bno) -->
