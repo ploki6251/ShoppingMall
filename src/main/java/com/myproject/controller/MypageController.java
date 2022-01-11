@@ -62,14 +62,17 @@ public class MypageController {
 	public void getLikeyList(Model model, HttpServletRequest req, LikeyVO likeyVO) throws Exception {
 		logger.info("likey 페이지가 컨트롤러에 의해 GET 실행");
 		
-		//로그인세션가져오기		  
+		//로그인세션가져오기
 		HttpSession session = req.getSession();
 		MemberVO memberVO = (MemberVO) session.getAttribute("member"); //memberVO는 세션
 		model.addAttribute("member", memberVO);
 		
-		int member_code = memberVO.getMember_code();
+		//System.out.println("세션값 : " + memberVO);
 		
-		if(memberVO != null) { //세션이 붙어있는상태
+		if(memberVO == null) {
+			System.out.println("세션이 비었음.");
+		}else {
+			int member_code = memberVO.getMember_code();
 			
 			//likeyVO에 세션 member_code를 부여.
 			likeyVO.setMember_code(member_code);
@@ -83,7 +86,6 @@ public class MypageController {
 			//화면으로 전달
 			model.addAttribute("likey_list", list);
 		}
-		
 	}
 	
 	//찜 목록 리스트 삭제
@@ -97,28 +99,39 @@ public class MypageController {
 		//로그인세션가져오기		  
 		HttpSession session = req.getSession();
 		MemberVO memberVO = (MemberVO) session.getAttribute("member"); //memberVO는 세션
-		int member_code = memberVO.getMember_code();
 		
+		//결과를 저장할 변수
 		int result = 0;
-		int likeyBno = 0;
 		
-		if(memberVO != null) {
+		if(memberVO == null) {
+			System.out.println("세션이 비었음.");
+		}else {
+			int member_code = memberVO.getMember_code();
+			
+			int likeyBno = 0;
+			
 			likeyVO.setMember_code(member_code);
 			
 			for(String i : selected_item) {		//selected_item 의 값을 차례로 for문에서 사용.
 				likeyBno = Integer.parseInt(i); 		//selected_item 요소들을 int로 변환하여 cartBno에 넣어줌
 				likeyVO.setBno(likeyBno);			//LikeyVO에 cartBno를 넣어줌
-				mypageService.deleteLikey(likeyVO);	//서비스로 넘김.
+				result = mypageService.deleteLikey(likeyVO);	//서비스로 넘김.
+				if(result == 0) {
+					break;
+				}
 				//System.out.println("값 : " + likeyBno);
 			}
-			result = 1;
 		}
 		return result;
+			
+			
+		
+		
 	}
 	
 	//장바구니 리스트 보기
 	@RequestMapping(value="/basket", method=RequestMethod.GET)
-	public void getBasketList(/*@RequestParam("name[]") List<String> name, @RequestParam("price[]") List<String> price,*/Model model, HttpServletRequest req, BasketVO basketVO) throws Exception {
+	public void getBasketList(Model model, HttpServletRequest req, BasketVO basketVO) throws Exception {
 		logger.info("basket 페이지가 컨트롤러에 의해 실행");
 		
 		//로그인세션가져오기
@@ -126,7 +139,9 @@ public class MypageController {
 		MemberVO memberVO = (MemberVO) session.getAttribute("member"); //memberVO는 세션
 		model.addAttribute("member", memberVO);
 		
-		if(memberVO != null) { //세션이 붙어있는상태
+		if(memberVO == null) {
+			System.out.println("세션이 비었음.");
+		}else {
 			int member_code = memberVO.getMember_code();
 			
 			basketVO.setMember_code(member_code);
@@ -137,59 +152,41 @@ public class MypageController {
 			model.addAttribute("basket_list", list);
 			model.addAttribute("bill", bill);
 		}
-	}
 		
-	//장바구니 리스트 체크 시 옆 계산서 영역에 추가 (basket-POST)
-	@ResponseBody
-	@RequestMapping(value="/checkedItemBno", method=RequestMethod.POST)
-	public List<String> postMakeListOfCheck(@RequestParam("checkedBno[]") List<String> selected_item, Model model, HttpServletRequest req, BasketVO basketVO) throws Exception {
-		//로그인세션가져오기		  
-		HttpSession session = req.getSession();
-		MemberVO memberVO = (MemberVO) session.getAttribute("member"); //memberVO는 세션
-		
-		List<String> result = null;
-		
-		if(memberVO != null) {				//세션이 붙어있는 상태
-			result = new ArrayList<String>();
-			
-			for(String i : selected_item) {			//selected_item 리스트 의 값을 차례로 for문에서 사용.
-				result.add(i); //체크된 아이템의 이름과 비용을 가져오는 서비스 메서드
-			}
-			
-			model.addAttribute("checkedBno", result);
-			
-			//테스트 코드
-			System.out.println("결과결과:" + result);
-		}
-		
-		return result;
 	}
 	
 	//장바구니 리스트 삭제
 	@ResponseBody
 	@RequestMapping(value="/delete_basket", method=RequestMethod.POST)
-	public int postBasketListDelete(@RequestParam("selected_item[]") List<String> selected_item, BasketVO basketVO,  HttpServletRequest req) throws Exception {
+	public int postBasketListDelete(@RequestParam("selected_item[]") List<String> selected_item, BasketVO basketVO, HttpServletRequest req) throws Exception {
 		logger.info("delete_basket 컨트롤러가 실행");
 		
 		//로그인세션가져오기
 		HttpSession session = req.getSession();
 		MemberVO memberVO = (MemberVO) session.getAttribute("member"); //memberVO는 세션
-		int member_code = memberVO.getMember_code();
 		
+		//결과를 저장할 변수
 		int result = 0;
-		int basketBno = 0;
 		
-		if(memberVO != null) {  //세션이 붙어있는 상태
+		if(memberVO == null) {
+			System.out.println("세션이 비었음.");
+		}else {
+			int member_code = memberVO.getMember_code();
+			
+			int basketBno = 0;
+			
 			basketVO.setMember_code(member_code);
 			
 			for(String i : selected_item) {	 			//selected_item 의 값을 차례로 for문에서 사용.
 				basketBno = Integer.parseInt(i);		//select_item 요소들을 int 로 변환하여 basketBno에 넣어줌
 				basketVO.setBno(basketBno);				//BasketVO에 BasketBno를 넣어줌
-				mypageService.deleteBasket(basketVO);	//서비스로 넘김.
+				result = mypageService.deleteBasket(basketVO);	//서비스로 넘김.
+				if(result == 0) {
+					break;
+				}
 				//System.out.println("값 : " + basketBno);
 			}
-			result = 1;
-		}
+		}	
 		return result;
 	}
 		
@@ -202,34 +199,40 @@ public class MypageController {
 		MemberVO memberVO = (MemberVO) session.getAttribute("member"); //memberVO는 세션
 		model.addAttribute("member", memberVO);
 		
-		//세션에서 받아온 member_code
-		int member_code = memberVO.getMember_code();
-		
-		if(memberVO != null) { //세션이 붙어있는상태
+		//세션이 비어있으면 alert 후 로그인 화면으로 돌려보냄
+		if(memberVO == null) {
+			System.out.println("세션이 비었음.");
+		}else {
+			//세션에서 받아온 member_code
+			int member_code = memberVO.getMember_code();
 			
 			orderVO.setMember_code(member_code);  //ordersVO 에 회원코드를 현재 세션값의 member_code로 가져옴
 			List<orderVO> list = null;
 			list = mypageService.orderList(orderVO);
 			model.addAttribute("order_list", list);
+			
 		}
 	}
 	
 	//주문내역 보기 post(날짜 설정하여 주문내역 보기)
 	@RequestMapping(value="/order", method=RequestMethod.POST)
 	public void postOrderList(Model model, HttpServletRequest req, MemberDateVO memberdateVO, String from_date, String to_date) throws Exception {
+		
 		//로그인세션가져오기
 		HttpSession session = req.getSession();
 		MemberVO memberVO = (MemberVO) session.getAttribute("member"); //memberVO는 세션
 		model.addAttribute("member", memberVO);
 		
-		//세션에서 받아온 member_code
-		int member_code = memberVO.getMember_code();
-		
-		//테스트용
-		System.out.println("값 : " + from_date);
-		System.out.println("값 : " + to_date);
-		
-		if(memberVO != null) { //세션이 붙어있는상태
+		if(memberVO == null) {
+			System.out.println("세션이 비었음.");
+		}else {
+			//세션에서 받아온 member_code
+			int member_code = memberVO.getMember_code();
+			
+			//테스트용
+			System.out.println("값 : " + from_date);
+			System.out.println("값 : " + to_date);
+			
 			memberdateVO.setFrom_date(from_date);
 			memberdateVO.setTo_date(to_date);			
 			memberdateVO.setMember_code(member_code);  //memberdateVO 에 회원코드를 현재 세션값의 member_code로 가져옴
@@ -250,14 +253,16 @@ public class MypageController {
 		MemberVO memberVO = (MemberVO) session.getAttribute("member"); //memberVO는 세션
 		model.addAttribute("member", memberVO);
 		
-		//세션에서 받아온 member_code
-		int member_code = memberVO.getMember_code();
-		
-		//필요한 변수들 선언.
-		TestBean orderDetailview = new TestBean();
-		List<orderVO> orderProductList = new ArrayList<orderVO>();
-		
-		if(memberVO != null) { //세션이 붙어있는상태
+		if(memberVO == null) {
+			System.out.println("세션이 비었음.");
+		}else {
+			//세션에서 받아온 member_code
+			int member_code = memberVO.getMember_code();
+			
+			//필요한 변수들 선언.
+			TestBean orderDetailview = new TestBean();
+			List<orderVO> orderProductList = new ArrayList<orderVO>();
+			
 			orderVO.setMember_code(member_code);
 			orderVO.setOrder_code(order_code);
 			
@@ -283,8 +288,14 @@ public class MypageController {
 		MemberVO memberVO = (MemberVO) session.getAttribute("member"); //memberVO는 세션
 		model.addAttribute("member", memberVO);
 		
-		logger.info("inputPassword() GET...");
+		if(memberVO == null) {
+			System.out.println("세션이 비었음.");
+		}else {
+			logger.info("inputPassword() GET...");
+			
+		}
 		return "/mypage/password";
+		
 	}
 	
 	
@@ -297,15 +308,17 @@ public class MypageController {
 		MemberVO memberVO = (MemberVO) session.getAttribute("member"); //memberVO는 세션
 		model.addAttribute("member", memberVO);
 		
-		//세션에서 받아온 id값.
-		String member_id = memberVO.getMember_id();
-		//int returnValue = 0;						//이 함수의 최종 결과값을 담을 변수선언.
-		
-		//테스트용
-		logger.info("member_id = " + member_id);
-		logger.info("member_pw = " + paramMVO.getMember_pw());
-		
-		if(memberVO != null) { //세션이 붙어있는상태
+		if(memberVO == null) {
+			System.out.println("세션이 비었음.");
+		}else {
+			//세션에서 받아온 id값.
+			String member_id = memberVO.getMember_id();
+			//int returnValue = 0;						//이 함수의 최종 결과값을 담을 변수선언.
+			
+			//테스트용
+			logger.info("member_id = " + member_id);
+			logger.info("member_pw = " + paramMVO.getMember_pw());
+			
 			paramMVO.setMember_id(member_id);  				// 현재 세션에 있는 회원 id 설정하여 
 			MemberVO result = memberService.login(paramMVO);//서비스에 메소드에 매개변수로 전달.
 			
@@ -320,8 +333,8 @@ public class MypageController {
 				//logger.info("있음");
 				ScriptUtils.alertAndMovePage(rep, "비밀번호를 확인했습니다. 다음페이지로 넘어갑니다.", "/mypage/update");
 				//returnValue = 1;
-			}			
-		}		
+			}
+		}
 	}
 	
 	//비밀번호 인증 후 회원정보 수정 화면 get
@@ -330,7 +343,10 @@ public class MypageController {
 		//로그인세션가져오기
 		HttpSession session = req.getSession();
 		MemberVO memberVO = (MemberVO) session.getAttribute("member"); //memberVO는 세션
-		model.addAttribute("member", memberVO);		
+		
+		
+		
+		model.addAttribute("member", memberVO);
 	}
 	
 	//비밀번호 인증 후 수정 버튼을 눌렀을 시 처리할 post
@@ -341,61 +357,66 @@ public class MypageController {
 		MemberVO memberVO = (MemberVO) session.getAttribute("member"); //memberVO는 세션
 		model.addAttribute("member", memberVO);	
 		
-		//세션에서 가져온 사용자 정보 값 치환
-		int member_code = memberVO.getMember_code();
-		String member_pw = memberVO.getMember_pw();
-		String member_name = memberVO.getMember_name();
-		String post_no = memberVO.getPost_no();
-		String member_addr1 = memberVO.getMember_addr1();
-		String member_addr2 = memberVO.getMember_addr2();
-		String member_email = memberVO.getMember_email();
-		String member_tel = memberVO.getMember_tel();
-		
-		//체크값 처리
-		//체크값이 넘어올때 	체크   -> true.
-		//				  		미체크 -> null.
-		//미체크 상태에서 null로 넘어올때를 잡아준다.
-		checkBox_val = (checkBox_val == null) ? false : true ;
-		
-		//System.out.println("체크 상태 : " + checkBox_val);
-		
-		if(checkBox_val) {
-			//오류 방지(cannot be null)
-			paramMVO.setMember_name(member_name);
-			paramMVO.setPost_no(post_no);
-			paramMVO.setMember_addr1(member_addr1);
-			paramMVO.setMember_addr2(member_addr2);
-			paramMVO.setMember_email(member_email);
-			paramMVO.setMember_tel(member_tel);
-			
-			//멤버 코드 전송
-			paramMVO.setMember_code(member_code);
-			
-			//sql문이 정상적으로 실행되면 1이 저장된다.
-			if(memberService.updatePwMember(paramMVO) == 1) {
-				session.setAttribute("member", memberService.login(paramMVO));
-				ScriptUtils.alertAndBackPage(rep, "비밀번호가 수정되었습니다!");
-			}else {
-				ScriptUtils.alertAndBackPage(rep, "비밀번호 수정 오류 발생!");
-			}
-			
+		if(memberVO == null) {
+			System.out.println("세션이 비었음.");
 		}else {
-			//오류 방지(cannot be null)
-			paramMVO.setMember_pw(member_pw);
+			//세션에서 가져온 사용자 정보 값 치환
+			int member_code = memberVO.getMember_code();
+			String member_pw = memberVO.getMember_pw();
+			String member_name = memberVO.getMember_name();
+			String post_no = memberVO.getPost_no();
+			String member_addr1 = memberVO.getMember_addr1();
+			String member_addr2 = memberVO.getMember_addr2();
+			String member_email = memberVO.getMember_email();
+			String member_tel = memberVO.getMember_tel();
 			
-			//멤버 코드 전송
-			paramMVO.setMember_code(member_code);
+			//체크값 처리
+			//체크값이 넘어올때 	체크   -> true.
+			//				  		미체크 -> null.
 			
-			if(memberService.updateMember(paramMVO) == 1) {
-				/*이미 수정이 완료된 상태 ->
-				 *  member라는 Attribute를 전체에서 쓰기 때문에 지금처럼 바꿔줘야 
-				 *  이 이후의 'member' 애트리뷰트를 액세스 할때 바뀐 내용이 적용되어 나타난다.
-				 */
-				session.setAttribute("member", memberService.login(memberVO)); 
-				ScriptUtils.alertAndBackPage(rep, "회원정보가 수정되었습니다!");
+			//미체크 상태에서 null로 넘어올때를 잡아준다.
+			checkBox_val = (checkBox_val == null) ? false : true ;
+			
+			//System.out.println("체크 상태 : " + checkBox_val);
+			
+			if(checkBox_val) {
+				//오류 방지(cannot be null)
+				paramMVO.setMember_name(member_name);
+				paramMVO.setPost_no(post_no);
+				paramMVO.setMember_addr1(member_addr1);
+				paramMVO.setMember_addr2(member_addr2);
+				paramMVO.setMember_email(member_email);
+				paramMVO.setMember_tel(member_tel);
+				
+				//멤버 코드 전송
+				paramMVO.setMember_code(member_code);
+				
+				//sql문이 정상적으로 실행되면 1이 저장된다.
+				if(memberService.updatePwMember(paramMVO) == 1) {
+					session.setAttribute("member", memberService.login(paramMVO));
+					ScriptUtils.alertAndBackPage(rep, "비밀번호가 수정되었습니다!");
+				}else {
+					ScriptUtils.alertAndBackPage(rep, "비밀번호 수정 오류 발생!");
+				}
 				
 			}else {
-				ScriptUtils.alertAndBackPage(rep, "회원정보가 수정 오류 발생!");
+				//오류 방지(cannot be null)
+				paramMVO.setMember_pw(member_pw);
+				
+				//멤버 코드 전송
+				paramMVO.setMember_code(member_code);
+				
+				if(memberService.updateMember(paramMVO) == 1) {
+					/*이미 수정이 완료된 상태 ->
+					 *  member라는 Attribute를 전체에서 쓰기 때문에 지금처럼 바꿔줘야 
+					 *  이 이후의 'member' 애트리뷰트를 액세스 할때 바뀐 내용이 적용되어 나타난다.
+					 */
+					session.setAttribute("member", memberService.login(memberVO));
+					ScriptUtils.alertAndBackPage(rep, "회원정보가 수정되었습니다!");
+					
+				}else {
+					ScriptUtils.alertAndBackPage(rep, "회원정보가 수정 오류 발생!");
+				}
 			}
 		}
 	}
@@ -410,45 +431,51 @@ public class MypageController {
 		//로그인세션가져오기
 		HttpSession session = req.getSession();
 		MemberVO memberVO = (MemberVO) session.getAttribute("member"); //memberVO는 세션
-		//세션에서 회원코드 get
-		int member_code = memberVO.getMember_code();
-		
-		//매개변수로 쓸 basketVO 객변 생성 및 초기화.
-		BasketVO basketVO = new BasketVO();
-		
-		//회원코드 장착
-		basketVO.setMember_code(member_code);
-		
-		//현재 장바구니목록을 담을 리스트(int 형)
-		List<Integer> basketPcList = new ArrayList<Integer>();
 		
 		//결과를 저장할 값.
-		int result;
+		int result = 0;
 		
-		//장바구니 목록을 집어넣음.
-		basketPcList = mypageService.basketPcList(basketVO);
-		
-		//리스트의 사이즈를 저장
-		int sizeOfBasketPcList = basketPcList.size();
-		
-		//장바구니 리스트가 0일때를 대비
-		result = sizeOfBasketPcList == 0 ? 1 : 0;
-		
-		//중복검사
-		for(int i = 0 ; i < sizeOfBasketPcList ; i++) {
-			int basketPc = basketPcList.get(i);
+		if(memberVO == null) {
+			System.out.println("세션이 비었음.");
+		}else {
+			//세션에서 회원코드 get
+			int member_code = memberVO.getMember_code();
 			
-			//System.out.println("값 : " + basketPc);
+			//매개변수로 쓸 basketVO 객변 생성 및 초기화.
+			BasketVO basketVO = new BasketVO();
 			
-			if(basketPc == product_code) {
-				result = 0;
-				break;					//필수
-			}else {
-				result = 1;
+			//회원코드 장착
+			basketVO.setMember_code(member_code);
+			
+			//현재 장바구니목록을 담을 리스트(int 형)
+			List<Integer> basketPcList = new ArrayList<Integer>();
+			
+			
+			
+			//장바구니 목록을 집어넣음.
+			basketPcList = mypageService.basketPcList(basketVO);
+			
+			//리스트의 사이즈를 저장
+			int sizeOfBasketPcList = basketPcList.size();
+			
+			//장바구니 리스트가 0일때를 대비
+			result = sizeOfBasketPcList == 0 ? 1 : 0;
+			
+			//중복검사
+			for(int i = 0 ; i < sizeOfBasketPcList ; i++) {
+				int basketPc = basketPcList.get(i);
+				
+				//System.out.println("값 : " + basketPc);
+				
+				if(basketPc == product_code) {
+					result = 0;
+					break;					//필수
+				}else {
+					result = 1;
+				}
 			}
-		}
-		
-		if(result == 1) {
+			
+			if(result == 1) {
 			//전달받은 값들을 basketVO에 장착
 			basketVO.setBasket_count(basket_count);
 			basketVO.setProduct_code(product_code);
@@ -458,7 +485,12 @@ public class MypageController {
 			mypageService.insert_basket(basketVO);
 		}
 		
-		return result;
+			
+	}
+	return result;
+		
+		
+		
 	}
 }
 

@@ -1,14 +1,13 @@
 package com.myproject.controller;
 
 
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+
 
 import java.util.List;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -17,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.myproject.domain.BasketVO;
-import com.myproject.domain.LikeyMonthVO;
 import com.myproject.domain.LikeyVO;
 import com.myproject.domain.MemberVO;
 import com.myproject.domain.TestBean;
@@ -44,7 +42,6 @@ public class MainController {
 		return "memberMain";
 	}	
 			
-	
 	//로그인
 	@RequestMapping(value="/include/header", method=RequestMethod.POST) 
 	public void headerlogin(Model model, HttpServletRequest req) throws Exception {		  
@@ -58,18 +55,20 @@ public class MainController {
 	@RequestMapping(value="/mypage", method= RequestMethod.GET)
 	public void getMypageMain(Model model, HttpServletRequest req, LikeyVO likeyVO, BasketVO basketVO, orderVO orderVO) throws Exception {
 		
-		//로그인세션가져오기		  
+		//로그인세션가져오기
 		HttpSession session = req.getSession();
 		MemberVO memberVO = (MemberVO) session.getAttribute("member");	
 		model.addAttribute("member", memberVO);
 		
-		int member_code = memberVO.getMember_code();
+		//세션이 비어있으면 alert 후 로그인 화면으로 돌려보냄
 		
-		
-		//테스트용
-		System.out.println("사용자 주소 : " + memberVO.getMember_addr1());
-		
-		if(memberVO != null) { //오직 세션이 붙어있는 상태
+		if(memberVO == null) {
+			System.out.println("세션이 비었음.");
+		}else {
+			int member_code = memberVO.getMember_code();
+			
+			//테스트용
+			System.out.println("사용자 주소 : " + memberVO.getMember_addr1());
 			
 			//likeyVO, basket_VO에 세션member_code 부여
 			likeyVO.setMember_code(member_code);
@@ -111,14 +110,12 @@ public class MainController {
 			//한 달 기준 갯수 (테스트용)
 			//model.addAttribute("likeyListMon_size", likey_list_mon.size());
 			//model.addAttribute("orderListMon_size", order_list_mon.size());
-			
+				
 			//총 주문금액
 			model.addAttribute("totalOrderPrice", totalOrderPrice);
+			
+			logger.info("Mypage 가 컨트롤러에 의해 get 실행");
 		}
-		
-				
-		logger.info("Mypage 가 컨트롤러에 의해 get 실행");
-		
 	}
 	
 	//마이페이지 메인 post

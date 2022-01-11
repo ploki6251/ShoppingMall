@@ -88,48 +88,51 @@ public class productsController {
 		MemberVO memberVO = (MemberVO) session.getAttribute("member");	
 		model.addAttribute("member", memberVO);
 		
-		//회원 코드 치환
-		int member_code = memberVO.getMember_code();
-		
-		//보기
-		productVO View = null;
-		View = productService.productView(product_code);
-		model.addAttribute("productView", View);
-		
-		//조회수
-		productService.updateViewCnt(product_code);
-		
-		//리뷰보기	
-		List<reviewVO> list = null;
-		list = reviewService.reviewAll(Integer.toString(product_code));
-		model.addAttribute("reviewAll", list);
-		
-		//사용자 좋아요 여부
-		List<Integer> likeyPcList = null;
-		LikeyVO likeyVO = new LikeyVO();
-		boolean iLoveProduct = false;
-		
-		likeyVO.setMember_code(member_code);
-		likeyVO.setProduct_code(product_code);
-		
-		likeyPcList = mypageService.likeyPcList(likeyVO);
-		
-		for(int i = 0 ; i < likeyPcList.size() ; i++) {
-			int pc = likeyPcList.get(i);
+		if(memberVO == null) {
+			System.out.println("세션이 비었음");
+		}else {
+			//회원 코드 치환
+			int member_code = memberVO.getMember_code();
 			
-			if(pc == product_code) {
-				iLoveProduct = true;
-				break;
+			//보기
+			productVO View = null;
+			View = productService.productView(product_code);
+			model.addAttribute("productView", View);
+			
+			//조회수
+			productService.updateViewCnt(product_code);
+			
+			//리뷰보기	
+			List<reviewVO> list = null;
+			list = reviewService.reviewAll(Integer.toString(product_code));
+			model.addAttribute("reviewAll", list);
+			
+			//사용자 좋아요 여부
+			List<Integer> likeyPcList = null;
+			LikeyVO likeyVO = new LikeyVO();
+			boolean iLoveProduct = false;
+			
+			likeyVO.setMember_code(member_code);
+			likeyVO.setProduct_code(product_code);
+			
+			likeyPcList = mypageService.likeyPcList(likeyVO);
+			
+			for(int i = 0 ; i < likeyPcList.size() ; i++) {
+				int pc = likeyPcList.get(i);
+				
+				if(pc == product_code) {
+					iLoveProduct = true;
+					break;
+				}
 			}
+			
+			model.addAttribute("iLoveProduct", iLoveProduct);
+			
+			//리뷰갯수
+			int cnt = 0;
+			cnt = reviewService.reviewCnt(product_code);
+			model.addAttribute("reviewCnt", cnt);
 		}
-		
-		model.addAttribute("iLoveProduct", iLoveProduct);
-		
-		//리뷰갯수
-		int cnt = 0;
-		cnt = reviewService.reviewCnt(product_code);
-		model.addAttribute("reviewCnt", cnt);		
-		
 	}		
 	
 	//상품 수정 get

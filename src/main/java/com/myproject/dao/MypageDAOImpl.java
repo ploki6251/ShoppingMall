@@ -59,8 +59,8 @@ private static final Logger logger = LoggerFactory.getLogger(MypageController.cl
 	
 	//찜목록 삭제(bno)
 	@Override
-	public void deleteLikey(LikeyVO likeyvo) throws Exception {
-		sqlSession.delete(namespace + ".deleteLikey", likeyvo);
+	public int deleteLikey(LikeyVO likeyvo) throws Exception {
+		return sqlSession.delete(namespace + ".deleteLikey", likeyvo);
 	}
 	
 	//찜목록 삭제(product_code로)
@@ -92,8 +92,8 @@ private static final Logger logger = LoggerFactory.getLogger(MypageController.cl
 	
 	//장바구니 목록 삭제
 	@Override
-	public void deleteBasket(BasketVO basketVO) throws Exception {
-		sqlSession.delete(namespace + ".deleteBasket", basketVO);
+	public int deleteBasket(BasketVO basketVO) throws Exception {
+		return sqlSession.delete(namespace + ".deleteBasket", basketVO);
 	}
 	
 	//주문내역 보기

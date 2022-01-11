@@ -25,7 +25,7 @@ public interface MypageService {
 	public List<LikeyVO> likeyListMonth(int member_code) throws Exception;
 	
 	//찜 목록 삭제(bno로)
-	public void deleteLikey(LikeyVO likeyvo) throws Exception;
+	public int deleteLikey(LikeyVO likeyvo) throws Exception;
 	
 	//찜목록 삭제(product_code로)
 	public int deleteLikeyPc(LikeyVO likeyVO) throws Exception;
@@ -40,7 +40,7 @@ public interface MypageService {
 	public List<Integer> basketPcList(BasketVO basketVO) throws Exception;
 	
 	//장바구니 목록 삭제
-	public void deleteBasket(BasketVO basketVO) throws Exception;
+	public int deleteBasket(BasketVO basketVO) throws Exception;
 	
 	//주문내역 보기
 	public List<orderVO> orderList(orderVO orderVO) throws Exception;

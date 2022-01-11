@@ -16,11 +16,11 @@
 
 <h1 style="margin-bottom: 30px; text-align: center;">주문완료</h1>
 <div class="row">
-	<div class="col-sm-12 mb-5 mt4">		
+	<div class="col-sm-12 mb-5 mt4">
 		<h3 style="text-align: center;">계좌번호</h3>
 		<h5 style="text-align: center;">국민은행 1111-1111-111111</h5>
 		<h5 style="text-align: center;">예금주 logotest</h5>
-	</div>	
+	</div>
 	<div class="col-sm-12">		
 		<h3 style="text-align: center;">주문번호</h3>
 		<h5 style="text-align: center;">1111111</h5>			

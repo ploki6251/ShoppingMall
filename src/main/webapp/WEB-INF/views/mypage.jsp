@@ -7,7 +7,14 @@
 
 <!-- 세션 사용여부 옵션 -->
 <!-- page 디렉티브의 session 속성의 기본값은 true이므로 false로 지정하지 않으면 자동 생성된다. -->
-<%@ page session="false" %>
+<% 
+if(session.getAttribute("member") == null) {
+
+	out.println("<script> alert('세션이 비어있습니다. 로그인 페이지로 이동합니다.'); </script>");
+	out.println("<script> location.href = '/member/login'; </script>");
+	//response.sendRedirect("/member/login"); 실행되기 이전의 out.print들은 무시함
+}
+%>
 
 <!DOCTYPE html>
 <html>
@@ -202,7 +209,41 @@ padding:10px 10px 10px 10px;
 	height: 150px;
 	object-fit: fill;
 }
- 
+
+#likey_area{
+	margin-top: 20px;
+	text-align: center;
+	height: 320px;
+}
+
+#likey a{
+	text-decoration-line: none;
+}
+
+#likey:hover{
+	background-color: #d2d2d3;
+}
+
+.likey_name{
+	color: black;
+	margin-top : 5px;
+	font-size: 20px;
+	font-weight: bold;
+	
+}
+
+.likey_price{
+	color: black;
+	margin-top: -10px;
+	font-size: 15px;
+}
+
+.likey_date{
+	color: black;
+	margin-top: 0px;
+	font-size: 15px;
+}
+
 	
 	
 </style>
@@ -218,7 +259,7 @@ padding:10px 10px 10px 10px;
 					<a href="${path}/mypage/password">회원정보수정</a>
 					<div id="p_area" align="right">
 						<p>가입일자 : ${member.mcreate}</p> <!-- fmt:formatDate value="${member.mcreate}" pattern="yyyy-MM-dd"/-->
-						<p>총 구매금액 : ${totalOrderPrice} 원</p>
+						<p>총 구매금액 : <fmt:formatNumber pattern="###,###,###" value="${totalOrderPrice}"/>원</p>
 					</div>
 					
 				</div>
@@ -299,7 +340,7 @@ padding:10px 10px 10px 10px;
 											<c:otherwise>오류발생 ?</c:otherwise>
 										</c:choose>
 									</td>
-									<td>${TestBean.orders.total_price}</td>
+									<td><fmt:formatNumber pattern="###,###,###" value="${TestBean.orders.total_price}"/>원</td>
 									<td>${TestBean.orders.order_status}</td>
 									<td><fmt:formatDate value="${TestBean.orders.order_date}" pattern="yyyy-MM-dd"/></td>
 								</tr>
@@ -324,28 +365,23 @@ padding:10px 10px 10px 10px;
 			</c:when>
 			
 			<c:otherwise>
-				<div class="col-sm-8">
-					<table class="table table-hover table-condensed">
-						<caption>최근 한 달간 목록만 표시됩니다.</caption>
-						<thead class="thead-dark">
-							<tr>
-								<th colspan="2">상품명</th>
-								<th>금액</th>
-								<th>등록 일자</th>
-							</tr>			
-						</thead>
-						<tbody>
-							<c:forEach items="${likeyListMon}" var="TestBean">
-								<tr>
-									<td style="width: 10%"><img src="${TestBean.products.img_view}" alt="상품썸네일"/></td>
-									<td><a href="${path}/products/productView?product_code=${TestBean.products.product_code}">${TestBean.products.product_name}</a></td>
-									<td>${TestBean.products.product_price}</td>
-									<td><fmt:formatDate value="${TestBean.likey.register_date}" pattern="yyyy-MM-dd"/></td>
-								</tr>
-							</c:forEach>
-						</tbody>
-					</table>
+				<div class="row">
+					
+						<c:forEach items="${likeyListMon}" var="TestBean">
+							<div id="likey" class="col-sm-3">
+								<a href="${path}/products/productView?product_code=${TestBean.products.product_code}">
+									<div id="likey_area">
+										<img src="${TestBean.products.img_view}" alt="상품썸네일"/>
+										<h3 class="likey_name">${TestBean.products.product_name}</h3>
+										<h3 class="likey_price"><fmt:formatNumber pattern="###,###,###" value="${TestBean.products.product_price}"/>원</h3>
+										<h3 class="likey_date"><fmt:formatDate value="${TestBean.likey.register_date}" pattern="yyyy-MM-dd"/></h3>
+									</div>
+								</a>
+							</div>
+						</c:forEach>
+					
 				</div>
+				
 			</c:otherwise>
 		</c:choose>
 		
