@@ -21,7 +21,6 @@ import com.myproject.domain.MemberVO;
 import com.myproject.domain.TestBean;
 import com.myproject.domain.orderVO;
 import com.myproject.service.MypageService;
-import com.myproject.utils.ScriptUtils;
 
 
 @Controller
