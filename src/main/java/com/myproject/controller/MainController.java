@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.myproject.domain.BasketVO;
-import com.myproject.domain.LikeyMonthVO;
 import com.myproject.domain.LikeyVO;
 import com.myproject.domain.MemberVO;
 import com.myproject.domain.TestBean;
